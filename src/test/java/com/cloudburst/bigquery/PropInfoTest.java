@@ -33,4 +33,35 @@ public class PropInfoTest {
         assertEquals(false,propInfo.isOptional());
         assertTrue(Map.class.isAssignableFrom(propInfo.getPropertyClass()));
     }
+
+    @Test
+    public void testLong() {
+        PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(ExampleItem.class,"timeTaken");
+        PropInfo propInfo = PropInfo.create(pd);
+        assertEquals(false,propInfo.isOptional());
+        assertEquals(Long.TYPE,propInfo.getPropertyClass());
+        FieldType type = FieldType.fromClass(propInfo.getPropertyClass());
+        assertEquals(FieldType.INTEGER,type);
+    }
+
+    @Test
+    public void testOptionalInteger() {
+        PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(ExampleItem.class,"optionalInteger");
+        PropInfo propInfo = PropInfo.create(pd);
+        assertEquals(true,propInfo.isOptional());
+        assertEquals(Integer.class,propInfo.getPropertyClass());
+        FieldType type = FieldType.fromClass(propInfo.getPropertyClass());
+        assertEquals(FieldType.INTEGER,type);
+    }
+
+    @Test
+    public void testOptionalLong() {
+        PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(ExampleItem.class,"optionalLong");
+        PropInfo propInfo = PropInfo.create(pd);
+        assertEquals(true,propInfo.isOptional());
+        assertEquals(Long.class,propInfo.getPropertyClass());
+        FieldType type = FieldType.fromClass(propInfo.getPropertyClass());
+        assertEquals(FieldType.INTEGER,type);
+    }
+
 }

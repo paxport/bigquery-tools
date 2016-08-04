@@ -172,7 +172,7 @@ public abstract class BigQueryTable {
         if (response != null && response.getInsertErrors() != null) {
             for (TableDataInsertAllResponse.InsertErrors err : response.getInsertErrors()) {
                 for (ErrorProto ep : err.getErrors()) {
-                    logger.warn("insert error code " + ep.getReason() + " --> " + ep.getMessage());
+                    logger.warn("Error inserting into " + ep.getLocation() + " of " + getTableId() + " --> " + ep.getDebugInfo());
                 }
             }
         }

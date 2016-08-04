@@ -2,6 +2,7 @@ package com.cloudburst.bigquery;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,8 +15,10 @@ public class ExampleItem {
     private Optional<String> optionalString;
     private ZonedDateTime dateTime;
     private Optional<Integer> optionalInteger;
+    private Optional<Long> optionalLong;
+    private long timeTaken = 1234;
 
-    private Map<String,String> tracking = new HashMap<>();
+    private Map<String,String> tracking = new LinkedHashMap<>();
 
     public Map<String, String> getTracking() {
         return tracking;
@@ -59,6 +62,24 @@ public class ExampleItem {
 
     public ExampleItem setOptionalInteger(Optional<Integer> optionalInteger) {
         this.optionalInteger = optionalInteger;
+        return this;
+    }
+
+    public long getTimeTaken() {
+        return timeTaken;
+    }
+
+    public ExampleItem setTimeTaken(long timeTaken) {
+        this.timeTaken = timeTaken;
+        return this;
+    }
+
+    public Optional<Long> getOptionalLong() {
+        return optionalLong;
+    }
+
+    public ExampleItem setOptionalLong(Optional<Long> optionalLong) {
+        this.optionalLong = optionalLong;
         return this;
     }
 }

@@ -23,8 +23,9 @@ import java.util.stream.Collectors;
 
 /**
  * Will use property descriptors to create table definition and convert items into rows
- * will assume all properties are required unless defined as an Optional<E>
- * @param <E>
+ * will assume all properties are required unless defined as an Optional<E> or defaultFieldMode
+ * is overridden
+ * @param <E> the type of item that will map to a row
  */
 public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
 
@@ -76,7 +77,7 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
             return null;
         }
         PropInfo propInfo = PropInfo.create(prop);
-        FieldType fieldType = FieldType.fromClass(propInfo.getClass());
+        FieldType fieldType = FieldType.fromClass(propInfo.getPropertyClass());
         FieldMode mode = propInfo.isOptional() ? FieldMode.NULLABLE : defaultFieldMode();
         return field(prop.getName(),fieldType,mode);
     }
@@ -111,14 +112,12 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         return row;
     }
 
-    protected Object valueForProperty(PropertyDescriptor descriptor, Object item) {
+    protected Object valueForProperty(PropertyDescriptor descriptor, E item) {
         try {
             Object value = descriptor.getReadMethod().invoke(item);
             if ( value instanceof Optional ) {
                 Optional optional = (Optional) value;
-                if ( optional.isPresent() ) {
-                    value = optional.get();
-                }
+                value = optional.orElse(null);
             }
             return convertValueIntoColumnData(value);
         } catch (IllegalAccessException e) {
