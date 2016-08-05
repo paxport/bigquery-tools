@@ -3,11 +3,12 @@ package com.cloudburst.bigquery;
 import com.google.api.services.bigquery.model.TableDataInsertAllResponse;
 import com.google.api.services.bigquery.model.TableFieldSchema;
 
-import org.springframework.beans.BeanUtils;
-
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
     protected List<TableFieldSchema> createTableFields() {
         List<TableFieldSchema> fields = new ArrayList<>();
         // use reflection to build fields
-        PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(targetClass);
+        List<PropertyDescriptor> propertyDescriptors = propertyDescriptors(targetClass);
         for (PropertyDescriptor descriptor : propertyDescriptors) {
             propertyDescriptorMap.put(descriptor.getName(),descriptor);
             if ( !excludedProperties.contains(descriptor.getName())){
@@ -69,6 +70,36 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         // now add in the pre-defined fields
         fields.addAll(definedFields.values());
         return fields;
+    }
+
+    /**
+     * Need to grab properties for any getProp or isProp including interfaces
+     * Don't bother with getClass()
+     * @param targetClass
+     * @return
+     */
+    protected List<PropertyDescriptor> propertyDescriptors(Class<E> targetClass){
+        try {
+            List<PropertyDescriptor> result = new ArrayList<>();
+            for (Method method : targetClass.getMethods()) {
+                String methodName = method.getName();
+                String propName = null;
+                if ( methodName.startsWith("get") ) {
+                    propName = methodName.substring(3);
+                }
+                else if (methodName.startsWith("is") ) {
+                    propName = methodName.substring(2);
+                }
+                if ( propName != null && !"Class".equals(propName)) {
+                    propName = Introspector.decapitalize(propName);
+                    PropertyDescriptor descriptor = new PropertyDescriptor(propName,method,null);
+                    result.add (descriptor);
+                }
+            }
+            return result;
+        } catch (IntrospectionException e) {
+            throw new RuntimeException("Failed to determine property descriptors", e);
+        }
     }
 
     protected TableFieldSchema fieldFromPropertyDescriptor(PropertyDescriptor prop) {
