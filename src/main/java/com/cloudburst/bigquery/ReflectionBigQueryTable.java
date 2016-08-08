@@ -150,7 +150,7 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
                 Optional optional = (Optional) value;
                 value = optional.orElse(null);
             }
-            return convertValueIntoColumnData(value);
+            return convertValueIntoColumnData(value, descriptor.getName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -158,7 +158,7 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         }
     }
 
-    protected Object convertValueIntoColumnData(Object value) {
+    protected Object convertValueIntoColumnData(Object value, String propName) {
         if ( value instanceof ZonedDateTime ) {
             ZonedDateTime zdt = (ZonedDateTime) value;
             return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
