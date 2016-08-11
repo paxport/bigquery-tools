@@ -35,8 +35,8 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
     protected Map<String,PropertyDescriptor> propertyDescriptorMap = new Hashtable<>();
     protected Map<String,TableFieldSchema> definedFields = customFields();
 
-    protected ReflectionBigQueryTable(Class<E> cls, String projectId, String datasetId, String tableId) {
-        super(projectId, datasetId, tableId);
+    protected ReflectionBigQueryTable(Class<E> cls, TableIdentifier identifier) {
+        super(identifier);
         targetClass = cls;
     }
 

@@ -41,6 +41,12 @@ public abstract class BigQueryTable {
         this.tableId = tableId;
     }
 
+    protected BigQueryTable (TableIdentifier tableIdentifier) {
+        this.projectId = tableIdentifier.getProjectId();
+        this.datasetId = tableIdentifier.getDatasetId();
+        this.tableId = tableIdentifier.getTableId();
+    }
+
     /**
      * Connect to BigQuery and create table if not there
      */
@@ -99,6 +105,12 @@ public abstract class BigQueryTable {
         table.setTableReference(ref);
         table.setFriendlyName(getTableId());
         table.setSchema(tableSchema());
+        try{
+            logger.info("Table Content is: " + table.toPrettyString());
+        }
+        catch (Exception e){
+            logger.warn("Failed to log table content",e);
+        }
         return table;
     }
 
@@ -142,6 +154,25 @@ public abstract class BigQueryTable {
 
     public String getTableId() {
         return tableId;
+    }
+
+    public TableIdentifier getIdentifier() {
+        return new TableIdentifier() {
+            @Override
+            public String getProjectId() {
+                return projectId;
+            }
+
+            @Override
+            public String getDatasetId() {
+                return datasetId;
+            }
+
+            @Override
+            public String getTableId() {
+                return tableId;
+            }
+        };
     }
 
     public String fqn() {

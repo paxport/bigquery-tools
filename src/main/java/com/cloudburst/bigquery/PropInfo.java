@@ -1,9 +1,12 @@
 package com.cloudburst.bigquery;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 /**
  * Work out which Class a property is from return type
@@ -27,8 +30,9 @@ public class PropInfo {
         return optional;
     }
 
-    public static PropInfo create(Type type) {
-        boolean optional = false;
+    public static PropInfo create(Method readMethod) {
+        Type type = readMethod.getGenericReturnType();
+        boolean optional = readMethod.getAnnotation(Nullable.class) != null;
         if ( type instanceof ParameterizedType ) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             if ( parameterizedType.getRawType().equals(Optional.class) ) {
@@ -48,7 +52,7 @@ public class PropInfo {
     }
 
     public static PropInfo create(PropertyDescriptor descriptor) {
-        return create(descriptor.getReadMethod().getGenericReturnType());
+        return create(descriptor.getReadMethod());
     }
 
 }

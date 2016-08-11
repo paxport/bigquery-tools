@@ -12,7 +12,7 @@ import java.util.Set;
 public class ExampleTable extends ReflectionBigQueryTable<ExampleItem> {
 
     protected ExampleTable() {
-        super(ExampleItem.class, "paxportcloud", "paxportcloud_audit", "example_item");
+        super(ExampleItem.class, new SimpleTableIdentifier("paxportcloud", "paxportcloud_audit", "example_item"));
     }
 
     @Override
