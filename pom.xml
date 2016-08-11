@@ -108,8 +108,8 @@
     </distributionManagement>
 
     <scm>
-        <connection>https://github.com/CloudburstStrategy/bigquery-tools.git</connection>
-        <developerConnection>git@github.com:CloudburstStrategy/bigquery-tools.git</developerConnection>
+        <connection>scm:git:https://github.com/CloudburstStrategy/bigquery-tools.git</connection>
+        <developerConnection>scm:git:git@github.com:CloudburstStrategy/bigquery-tools.git</developerConnection>
         <url>https://github.com/CloudburstStrategy/bigquery-tools</url>
         <tag>HEAD</tag>
     </scm>
