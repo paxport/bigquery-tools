@@ -187,12 +187,7 @@ public abstract class BigQueryTable {
         List<TableDataInsertAllRequest.Rows> insertRows = rows.stream()
                 .map(r -> new TableDataInsertAllRequest.Rows().setJson(r))
                 .collect(Collectors.toList());
-        TableDataInsertAllResponse response = bigquery.tabledata().insertAll(
-                projectId,
-                datasetId,
-                tableId,
-                new TableDataInsertAllRequest().setRows(insertRows)).execute();
-
+        TableDataInsertAllResponse response = insertAllWithRetries(insertRows);
         if (response != null && response.getInsertErrors() != null) {
             for (TableDataInsertAllResponse.InsertErrors err : response.getInsertErrors()) {
                 for (ErrorProto ep : err.getErrors()) {
@@ -203,6 +198,27 @@ public abstract class BigQueryTable {
         return response;
     }
 
+    private TableDataInsertAllResponse insertAllWithRetries(List<TableDataInsertAllRequest.Rows> insertRows) throws IOException {
+        Exception e = new Exception();
+        for (int i = 0; i < 5; i++) {
+            try {
+                return bigquery.tabledata().insertAll(
+                        projectId,
+                        datasetId,
+                        tableId,
+                        new TableDataInsertAllRequest().setRows(insertRows)).execute();
+            } catch (GoogleJsonResponseException e1) {
+                // retry if service unavailable
+                if ( e1.getStatusCode() == 503 ) {
+                    e = e1;
+                }
+                else {
+                    throw e1;
+                }
+            }
+        }
+        throw new RuntimeException("Failed to insert into bigquery after retrying",e);
+    }
 
 
     @Override
