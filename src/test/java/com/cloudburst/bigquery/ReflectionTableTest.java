@@ -2,17 +2,16 @@ package com.cloudburst.bigquery;
 
 import com.google.api.services.bigquery.model.TableDataInsertAllResponse;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-/**
- * Created by ajchesney on 03/08/2016.
- */
+
+@Ignore("requires live big query access")
 public class ReflectionTableTest {
 
     private static BigQueryFactory factory = new BigQueryFactory();
