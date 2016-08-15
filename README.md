@@ -10,6 +10,26 @@ Uses Spring.
 * Use ReflectionBigQueryTable to automatically map a Java Class into a BigQueryTable
 * Define a Query against BigQuery and run a QueryJob with BigQueryJobFactory
 
+## JCenter Dependency
+
+Add JCenter to your repositories if not already:
+
+    <repositories>
+        <repository>
+            <id>jcenter-snapshots</id>
+            <name>jcenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
+    
+Add cloud audit dependency:
+
+    <dependency>
+        <groupId>com.cloudburst</groupId>
+        <artifactId>bigquery-tools</artifactId>
+        <version>1.0.2</version>
+    </dependency>
+
 
 ## To Release new version to Bintray
 
