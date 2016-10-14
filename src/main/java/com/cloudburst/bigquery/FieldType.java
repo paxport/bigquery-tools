@@ -15,7 +15,10 @@ public enum FieldType {
     RECORD;
 
     public static FieldType fromClass (Class cls) {
-        if ( cls.equals(ZonedDateTime.class) ) {
+        if ( cls.equals(String.class) ) {
+            return STRING;
+        }
+        else if ( cls.equals(ZonedDateTime.class) ) {
             return TIMESTAMP;
         }
         else if ( cls.equals(Boolean.class) || cls.equals(Boolean.TYPE) ) {
@@ -37,7 +40,7 @@ public enum FieldType {
             return RECORD;
         }
         else{
-            return STRING;
+            return RECORD;
         }
     }
 }

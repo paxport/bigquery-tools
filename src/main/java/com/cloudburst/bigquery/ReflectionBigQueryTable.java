@@ -3,6 +3,9 @@ package com.cloudburst.bigquery;
 import com.google.api.services.bigquery.model.TableDataInsertAllResponse;
 import com.google.api.services.bigquery.model.TableFieldSchema;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
  */
 public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
 
+    private final static Logger logger = LoggerFactory.getLogger(ReflectionBigQueryTable.class);
+
     private Class<E> targetClass;
     protected Set<String> excludedProperties = defaultExcludedProperties();
     protected Map<String,PropertyDescriptor> propertyDescriptorMap = new Hashtable<>();
@@ -55,9 +60,16 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
 
     @Override
     protected List<TableFieldSchema> createTableFields() {
+        List<TableFieldSchema> fields = createFieldsForClass(targetClass);
+        // now add in the pre-defined fields
+        fields.addAll(definedFields.values());
+        return fields;
+    }
+
+    private List<TableFieldSchema> createFieldsForClass(Class cls) {
         List<TableFieldSchema> fields = new ArrayList<>();
         // use reflection to build fields
-        List<PropertyDescriptor> propertyDescriptors = propertyDescriptors(targetClass);
+        List<PropertyDescriptor> propertyDescriptors = propertyDescriptors(cls);
         for (PropertyDescriptor descriptor : propertyDescriptors) {
             propertyDescriptorMap.put(descriptor.getName(),descriptor);
             if ( !excludedProperties.contains(descriptor.getName())){
@@ -67,8 +79,6 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
                 }
             }
         }
-        // now add in the pre-defined fields
-        fields.addAll(definedFields.values());
         return fields;
     }
 
@@ -110,7 +120,11 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         PropInfo propInfo = PropInfo.create(prop);
         FieldType fieldType = FieldType.fromClass(propInfo.getPropertyClass());
         FieldMode mode = propInfo.isOptional() ? FieldMode.NULLABLE : defaultFieldMode();
-        return field(prop.getName(),fieldType,mode);
+        TableFieldSchema result = field(prop.getName(),fieldType,mode);
+        if ( fieldType == FieldType.RECORD ){
+            result.setFields(createFieldsForClass(prop.getPropertyType()));
+        }
+        return result;
     }
 
     // required by default but easy to make nullable
@@ -129,21 +143,31 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         return insertRows(rows);
     }
 
-    protected Map<String,Object> toRow (E item) {
+    protected Map<String,Object> toRow (E item){
+        return toMap(item, tableFields());
+    }
+
+    protected Map<String,Object> toMap (Object item, Collection<TableFieldSchema> fields) {
         Map<String,Object> row = new HashMap<>();
-        for (TableFieldSchema field : tableFields()) {
+        for (TableFieldSchema field : fields) {
             PropertyDescriptor descriptor = propertyDescriptorMap.get(field.getName());
             if ( descriptor != null && !excludedProperties.contains(field.getName())) {
                 Object value = valueForProperty(descriptor,item);
                 if ( value != null ){
-                    row.put(descriptor.getName(),value);
+                    if ( field.getType().equals(FieldType.RECORD.name()) ) {
+                        Map<String,Object> embedded = toMap(value,field.getFields());
+                        row.put(descriptor.getName(),embedded);
+                    }
+                    else {
+                        row.put(descriptor.getName(),value);
+                    }
                 }
             }
         }
         return row;
     }
 
-    protected Object valueForProperty(PropertyDescriptor descriptor, E item) {
+    protected Object valueForProperty(PropertyDescriptor descriptor, Object item) {
         try {
             Object value = descriptor.getReadMethod().invoke(item);
             if ( value instanceof Optional ) {
