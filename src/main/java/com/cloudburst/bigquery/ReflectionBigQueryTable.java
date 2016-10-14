@@ -67,6 +67,9 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
     }
 
     private List<TableFieldSchema> createFieldsForClass(Class cls) {
+        if(logger.isDebugEnabled()){
+            logger.debug("Creating Fields for class " + cls.getName() );
+        }
         List<TableFieldSchema> fields = new ArrayList<>();
         // use reflection to build fields
         List<PropertyDescriptor> propertyDescriptors = propertyDescriptors(cls);
@@ -75,6 +78,9 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
             if ( !excludedProperties.contains(descriptor.getName())){
                 TableFieldSchema field = fieldFromPropertyDescriptor(descriptor);
                 if ( field != null ){
+                    if(logger.isDebugEnabled()){
+                        logger.debug("Adding field " + field.getName() + " of type " + field.getType() );
+                    }
                     fields.add(field);
                 }
             }
@@ -89,7 +95,7 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
      * @return
      */
     protected List<PropertyDescriptor> propertyDescriptors(Class<E> targetClass){
-        try {
+
             List<PropertyDescriptor> result = new ArrayList<>();
             for (Method method : targetClass.getMethods()) {
                 String methodName = method.getName();
@@ -102,14 +108,20 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
                 }
                 if ( propName != null && !"Class".equals(propName)) {
                     propName = Introspector.decapitalize(propName);
-                    PropertyDescriptor descriptor = new PropertyDescriptor(propName,method,null);
-                    result.add (descriptor);
+                    try{
+                        PropertyDescriptor descriptor = new PropertyDescriptor(propName,method,null);
+                        logger.debug("Property Descriptor " + descriptor);
+                        result.add (descriptor);
+                    }
+                    catch (IntrospectionException e){
+                        logger.info("no prop descriptor available for " + propName + " in " + targetClass.getSimpleName() +
+                            " due to " + e.getMessage()
+                        );
+                    }
                 }
             }
             return result;
-        } catch (IntrospectionException e) {
-            throw new RuntimeException("Failed to determine property descriptors", e);
-        }
+
     }
 
     protected TableFieldSchema fieldFromPropertyDescriptor(PropertyDescriptor prop) {
@@ -158,13 +170,8 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
             if ( descriptor != null && !excludedProperties.contains(field.getName())) {
                 Object value = valueForProperty(descriptor,item);
                 if ( value != null ){
-                    if ( field.getType().equals(FieldType.RECORD.name()) ) {
-                        Map<String,Object> embedded = toMap(value,field.getFields());
-                        row.put(descriptor.getName(),embedded);
-                    }
-                    else {
-                        row.put(descriptor.getName(),value);
-                    }
+                    value = convertValueIntoColumnData(value, field);
+                    row.put(descriptor.getName(),value);
                 }
             }
         }
@@ -178,7 +185,7 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
                 Optional optional = (Optional) value;
                 value = optional.orElse(null);
             }
-            return convertValueIntoColumnData(value, descriptor.getName());
+            return value;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -186,13 +193,22 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         }
     }
 
-    protected Object convertValueIntoColumnData(Object value, String propName) {
-        if ( value instanceof ZonedDateTime ) {
-            ZonedDateTime zdt = (ZonedDateTime) value;
-            return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        }
-        else {
-            return value;
+    protected Object convertValueIntoColumnData(Object value, TableFieldSchema field) {
+        switch ( FieldType.valueOf(field.getType()) ) {
+            case RECORD :
+                return toMap(value,field.getFields());
+
+            case STRING:
+                return String.valueOf(value);
+
+            case TIMESTAMP:
+                if ( value instanceof ZonedDateTime ) {
+                    ZonedDateTime zdt = (ZonedDateTime) value;
+                    return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+                }
+
+            default:
+                return value;
         }
     }
 }

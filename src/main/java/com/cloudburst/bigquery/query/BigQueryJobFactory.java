@@ -15,5 +15,8 @@ public class BigQueryJobFactory {
         return new QueryJob<>(query, projectId,factory.getBigquery()).start();
     }
 
-
+    public BigQueryJobFactory setFactory(BigQueryFactory factory) {
+        this.factory = factory;
+        return this;
+    }
 }
