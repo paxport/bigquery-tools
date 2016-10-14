@@ -36,6 +36,9 @@ public enum FieldType {
         else if ( cls.equals(Double.class) || cls.equals(Double.TYPE) ) {
             return FLOAT;
         }
+        else if ( cls.isEnum() ) {
+            return STRING;
+        }
         else if ( Map.class.isAssignableFrom(cls) ) {
             return RECORD;
         }

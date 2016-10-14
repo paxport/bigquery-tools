@@ -117,6 +117,10 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
             // defined elsewhere
             return null;
         }
+        if ( excludedProperties.contains(prop.getName()) ) {
+            // excluded
+            return null;
+        }
         PropInfo propInfo = PropInfo.create(prop);
         FieldType fieldType = FieldType.fromClass(propInfo.getPropertyClass());
         FieldMode mode = propInfo.isOptional() ? FieldMode.NULLABLE : defaultFieldMode();
