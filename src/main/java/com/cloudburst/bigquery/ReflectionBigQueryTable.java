@@ -160,7 +160,11 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
     }
 
     protected Map<String,Object> toRow (E item){
-        return toMap(item, tableFields());
+        Map<String,Object> map = toMap(item, tableFields());
+        if ( logger.isDebugEnabled() ){
+            logger.debug("row map into bigquery ->\n" + map);
+        }
+        return map;
     }
 
     protected Map<String,Object> toMap (Object item, Collection<TableFieldSchema> fields) {
@@ -196,6 +200,9 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
     protected Object convertValueIntoColumnData(Object value, TableFieldSchema field) {
         switch ( FieldType.valueOf(field.getType()) ) {
             case RECORD :
+                if ( value instanceof Map ){
+                    return value;
+                }
                 return toMap(value,field.getFields());
 
             case STRING:
