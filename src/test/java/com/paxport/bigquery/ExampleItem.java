@@ -1,7 +1,6 @@
-package com.cloudburst.bigquery;
+package com.paxport.bigquery;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;

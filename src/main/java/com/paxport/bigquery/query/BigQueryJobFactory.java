@@ -1,6 +1,6 @@
-package com.cloudburst.bigquery.query;
+package com.paxport.bigquery.query;
 
-import com.cloudburst.bigquery.BigQueryFactory;
+import com.paxport.bigquery.BigQueryFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

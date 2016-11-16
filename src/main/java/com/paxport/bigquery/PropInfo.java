@@ -1,4 +1,4 @@
-package com.cloudburst.bigquery;
+package com.paxport.bigquery;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;

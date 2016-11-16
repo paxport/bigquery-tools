@@ -31,7 +31,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.cloudburst" level="DEBUG"/>
+    <logger name="com.paxport" level="DEBUG"/>
 
     <!-- Setting the root level of logging to INFO -->
     <root level="debug">

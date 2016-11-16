@@ -1,4 +1,4 @@
-package com.cloudburst.bigquery;
+package com.paxport.bigquery;
 
 import static org.junit.Assert.*;
 import org.junit.Test;

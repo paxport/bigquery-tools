@@ -25,7 +25,7 @@ Add JCenter to your repositories if not already:
 Add cloud audit dependency:
 
     <dependency>
-        <groupId>com.cloudburst</groupId>
+        <groupId>com.paxport</groupId>
         <artifactId>bigquery-tools</artifactId>
         <version>1.0.2</version>
     </dependency>

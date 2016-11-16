@@ -1,4 +1,4 @@
-package com.cloudburst.bigquery;
+package com.paxport.bigquery;
 
 public class BigQueryUtils {
 

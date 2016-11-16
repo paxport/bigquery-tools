@@ -1,4 +1,4 @@
-package com.cloudburst.bigquery.query;
+package com.paxport.bigquery.query;
 
 import org.joda.time.DateTime;
 

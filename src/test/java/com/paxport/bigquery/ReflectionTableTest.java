@@ -1,4 +1,4 @@
-package com.cloudburst.bigquery;
+package com.paxport.bigquery;
 
 import com.google.api.services.bigquery.model.TableDataInsertAllResponse;
 

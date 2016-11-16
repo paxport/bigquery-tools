@@ -1,4 +1,4 @@
-package com.cloudburst.bigquery.query;
+package com.paxport.bigquery.query;
 
 import com.google.api.services.bigquery.Bigquery;
 import com.google.api.services.bigquery.model.GetQueryResultsResponse;
