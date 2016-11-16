@@ -22,7 +22,7 @@ Add JCenter to your repositories if not already:
         </repository>
     </repositories>
     
-Add cloud audit dependency:
+Add dependency:
 
     <dependency>
         <groupId>com.paxport</groupId>
