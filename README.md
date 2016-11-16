@@ -27,7 +27,7 @@ Add cloud audit dependency:
     <dependency>
         <groupId>com.paxport</groupId>
         <artifactId>bigquery-tools</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
     </dependency>
 
 
