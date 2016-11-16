@@ -2,7 +2,6 @@ package com.cloudburst.bigquery;
 
 import com.google.api.services.bigquery.model.TableDataInsertAllResponse;
 import com.google.api.services.bigquery.model.TableFieldSchema;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,15 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -172,10 +163,15 @@ public abstract class ReflectionBigQueryTable<E> extends BigQueryTable {
         for (TableFieldSchema field : fields) {
             PropertyDescriptor descriptor = propertyDescriptorMap.get(field.getName());
             if ( descriptor != null && !excludedProperties.contains(field.getName())) {
-                Object value = valueForProperty(descriptor,item);
-                if ( value != null ){
-                    value = convertValueIntoColumnData(value, field);
-                    row.put(descriptor.getName(),value);
+                try{
+                    Object value = valueForProperty(descriptor,item);
+                    if ( value != null ){
+                        value = convertValueIntoColumnData(value, field);
+                        row.put(descriptor.getName(),value);
+                    }
+                }
+                catch (Exception e){
+                    logger.warn("Failed to read value for property " + descriptor.getName() + " of item " + item, e );
                 }
             }
         }
