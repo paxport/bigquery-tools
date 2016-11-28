@@ -1,6 +1,8 @@
 Big Query Tools
 ===================
 
+[![Build Status](https://travis-ci.org/paxport/bigquery-tools.svg?branch=master)](https://travis-ci.org/paxport/bigquery-tools)
+
 Tooling for working with Google Big Query
 
 Uses Spring.
