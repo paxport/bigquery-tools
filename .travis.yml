@@ -5,6 +5,8 @@ jdk:
 cache:
   directories:
   - $HOME/gcloud/
+env:
+- GOOGLE_APPLICATION_CREDENTIALS=$HOME/paxportcloud-travis-ci.json
 before_install:
 - openssl aes-256-cbc -K $encrypted_8475bbc8dba7_key -iv $encrypted_8475bbc8dba7_iv
   -in paxportcloud-travis-ci.json.enc -out paxportcloud-travis-ci.json -d
@@ -12,3 +14,6 @@ before_install:
   -o gcloudsdk.tar.gz; tar -xvzf gcloudsdk.tar.gz; ./google-cloud-sdk/install.sh --quiet;
   fi
 - ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file paxportcloud-travis-ci.json
+- pwd
+- ls -la
+- echo "app creds file is: $GOOGLE_APPLICATION_CREDENTIALS"
